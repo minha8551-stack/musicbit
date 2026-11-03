@@ -4,9 +4,9 @@
 <head>
 <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>음BTI | 맥박</title>
-<link href="dist/reset.css" rel="stylesheet"/>
-<link href="dist/reveal.css" rel="stylesheet"/>
-<link href="dist/theme/black.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reset.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/theme/black.css" rel="stylesheet"/>
 <style>
 :root{--pink:#ff59bf;--cyan:#65e6ff}
 .reveal{background:#08080d;font-family:Arial,'Apple SD Gothic Neo',sans-serif}
@@ -406,10 +406,10 @@ html,body{background:#080a09!important;color:#fff}
 .reveal .song-panel .song-youtube-cta:hover{background:#57f48b!important;transform:translateY(-2px)!important}
 .reveal .song-panel a.song-cover-btn{display:block!important;cursor:pointer!important;text-decoration:none!important}
 .reveal .song-panel .song-hint{font-size:clamp(11px,1vw,14px)!important}
-</style></head>
+</style><style id="remove-side-navigation">.app-side{display:none!important}</style></head>
 <body>
 <div aria-hidden="true" class="app-top"><div class="brand"><span class="brand-mark">◉</span> MACBAK <span class="brand-dim">/ 음악문화 연구회</span></div><div class="app-top-right"><span class="live-dot"></span> 음BTI RADIO <span class="edition">2026 EDITION</span></div></div>
-<div aria-hidden="true" class="app-side"><span class="side-active">01</span><span class="side-rule"></span><span>PLAYLIST</span><span>YOUR TYPE</span><span>DISCOVER</span></div>
+
 <div aria-hidden="true" class="app-bottom"><div class="bottom-album">♫</div><div class="bottom-track"><strong id="currentTrack">음BTI — YOUR MUSIC TYPE</strong><small>MACBAK · CURATED LISTENING EXPERIENCE</small></div><div class="bottom-controls"><span>⏮</span><span class="bottom-play">▶</span><span>⏭</span></div><div class="bottom-progress"><span id="deckProgress"></span></div><span class="bottom-time" id="deckPage">01 / 10</span></div>
 <div class="reveal"><div class="slides">
 <section class="opening" data-state="covers">
@@ -732,7 +732,7 @@ html,body{background:#080a09!important;color:#fff}
   <p class="logo-credit" id="closingLogoCredit">MACBAK 음악문화 연구회</p>
 </section>
 </div></div>
-<script src="dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
 <script>
 const grid=document.getElementById('grid');
 for(let i=1;i<=16;i++){
