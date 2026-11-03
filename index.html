@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>음BTI | 맥박</title>
+<link href="dist/reset.css" rel="stylesheet"/>
+<link href="dist/reveal.css" rel="stylesheet"/>
+<link href="dist/theme/black.css" rel="stylesheet"/>
+<style>
+:root{--pink:#ff59bf;--cyan:#65e6ff}
+.reveal{background:#08080d;font-family:Arial,'Apple SD Gothic Neo',sans-serif}
+.reveal .slides section{height:100%;box-sizing:border-box}
+.opening{display:flex!important;align-items:center;justify-content:center;flex-direction:column}
+.topster-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:min(1.1vh,9px);width:min(70vh,68vw);margin:auto}
+.cover{width:100%;aspect-ratio:1;object-fit:cover;opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.3);filter:blur(9px);transition:transform .85s cubic-bezier(.18,1.5,.35,1),opacity .5s,filter .7s;box-shadow:0 6px 20px #0008}
+.cover.show{opacity:1;transform:translate(0,0) rotate(0) scale(1);filter:blur(0)}
+.intro-caption{font-size:clamp(13px,1.4vw,21px)!important;letter-spacing:.24em;color:#aaa;margin:0 0 20px!important}
+.full-topster{max-width:94vw;max-height:85vh;object-fit:contain;opacity:0;transform:scale(.94);transition:opacity .9s,transform .9s}
+.full-topster.show{opacity:1;transform:scale(1)}
+.logo{font-size:clamp(90px,15vw,210px)!important;font-weight:900!important;color:var(--pink)!important;letter-spacing:-.07em;text-shadow:0 0 40px #ff59bf80;margin:0!important;animation:pop .95s cubic-bezier(.18,1.7,.35,1) both}
+.tagline{font-size:clamp(16px,2.4vw,32px)!important;letter-spacing:.22em;color:var(--cyan);margin-top:18px!important}
+@keyframes pop{from{opacity:0;transform:scale(.1) rotate(-9deg);filter:blur(16px)}to{opacity:1;transform:scale(1);filter:blur(0)}}
+.glitch{animation:glitch .45s steps(2,end)}
+@keyframes glitch{0%,100%{filter:none;transform:none}20%{filter:hue-rotate(120deg);transform:translate(13px,-4px)}40%{transform:translate(-11px,4px);filter:contrast(3)}60%{transform:translate(8px,0)}80%{filter:hue-rotate(270deg)}}
+/* 音 → 음 → 음BTI: one continuous title transformation */
+.logo-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:260px;width:100%;overflow:visible}
+.logo-morph{position:relative;display:inline-flex;align-items:center;justify-content:center;font-family:Arial,'Apple SD Gothic Neo',sans-serif;font-weight:900;white-space:nowrap;line-height:1.2;filter:drop-shadow(0 0 24px #ff59bf60)}
+.logo-character{font-size:clamp(110px,17vw,230px);color:var(--pink);display:inline-block;transition:transform .55s cubic-bezier(.2,1.5,.3,1),filter .25s,opacity .2s;transform-origin:center}
+.logo-bti{font-size:clamp(100px,15vw,210px);color:var(--pink);display:inline-block;max-width:0;opacity:0;overflow:hidden;letter-spacing:-.075em;transition:max-width .65s cubic-bezier(.2,.8,.2,1),opacity .3s,transform .65s;transform:translateX(85px)}
+.logo-morph.is-bti .logo-bti{max-width:500px;opacity:1;transform:translateX(0)}
+.logo-morph.is-bti .logo-character{transform:scale(.95)}
+.logo-morph.is-glitch .logo-character{animation:character-glitch .48s steps(2,end) both}
+.logo-morph.is-final{animation:logo-beat .75s cubic-bezier(.2,1.6,.3,1)}
+.logo-morph.is-final .logo-character,.logo-morph.is-final .logo-bti{filter:drop-shadow(0 0 20px #ff59bf88)}
+@keyframes character-glitch{0%{transform:translate(0) skew(0);filter:none}20%{transform:translate(-12px,3px) skew(-12deg);filter:hue-rotate(110deg)}40%{transform:translate(12px,-5px) skew(12deg);filter:contrast(3)}60%{transform:translate(-7px,2px) skew(-7deg);filter:blur(2px)}80%{transform:translate(7px,0);filter:hue-rotate(240deg)}100%{transform:translate(0);filter:none}}
+@keyframes logo-beat{0%,100%{transform:scale(1)}35%{transform:scale(1.16)}65%{transform:scale(.96)}}
+.logo-subtitle{opacity:0;transform:translateY(15px);transition:opacity .6s,transform .6s}
+.logo-subtitle.visible{opacity:1;transform:translateY(0)}
+.logo-credit{opacity:0;font-family:Arial,sans-serif!important;font-size:16px!important;font-weight:400!important;letter-spacing:0.18em!important;line-height:1.6!important;white-space:nowrap;text-align:center;color:#b9b9c6!important;margin:24px 0 0!important;transform:none!important;transition:opacity .6s ease!important}
+.logo-credit.visible{opacity:1}
+.hint{position:absolute;bottom:1.5vh;font-size:13px!important;color:#777}
+
+/* ACT 1 + ACT 2 */
+.reveal .story{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:5vh 5vw!important;text-align:center}
+.reveal .eyebrow{font-size:clamp(13px,1.3vw,19px)!important;color:#65e6ff;letter-spacing:.25em;font-weight:700;margin:0!important}
+.reveal .hero-line{font-size:clamp(37px,5.6vw,82px)!important;line-height:1.25;font-weight:900;margin:0!important;word-break:keep-all}
+.reveal .accent{color:#ff59bf}.reveal .cyan{color:#65e6ff}
+.reveal .story-copy{font-size:clamp(20px,2.2vw,30px)!important;line-height:1.6;color:#d2d1dc;word-break:keep-all;margin:0!important}
+.reveal .pair{display:grid;grid-template-columns:1fr 1fr;gap:24px;width:min(100%,1050px);margin:20px auto 0}
+.reveal .type-card{border:2px solid #ffffff22;border-radius:22px;padding:30px 20px;background:#ffffff08;min-width:0}
+.reveal .type-card:first-child{background:linear-gradient(140deg,#ff59bf25,#ff59bf08);border-color:#ff59bf77}
+.reveal .type-card:last-child{background:linear-gradient(140deg,#65e6ff24,#65e6ff08);border-color:#65e6ff77}
+.reveal .type-letter{font-size:clamp(70px,9vw,145px)!important;line-height:1.1;font-weight:900;margin:0!important}
+.reveal .type-card:first-child .type-letter{color:#ff59bf}.reveal .type-card:last-child .type-letter{color:#65e6ff}
+.reveal .type-name{font-size:clamp(19px,2.1vw,30px)!important;font-weight:800;margin:8px 0!important}
+.reveal .type-desc{font-size:clamp(15px,1.5vw,22px)!important;line-height:1.45;color:#d5d2df;margin:8px 0!important;word-break:keep-all}
+.reveal .small-question{font-size:clamp(17px,2vw,26px)!important;color:#aeb0c6;margin:0!important}
+.reveal .types-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:min(100%,940px);margin:10px auto}
+.reveal .type-chip{font-size:clamp(23px,3vw,42px);font-weight:900;letter-spacing:.03em;border:1px solid #65e6ff66;border-radius:12px;padding:14px 5px;background:linear-gradient(135deg,#ff59bf1c,#65e6ff18);color:#fff}
+.reveal .type-chip.fragment.visible{animation:chip-in .45s ease both}
+@keyframes chip-in{from{transform:translateY(20px) scale(.9);filter:blur(6px)}to{transform:translateY(0) scale(1);filter:blur(0)}}
+.reveal .mini-note{font-size:clamp(14px,1.4vw,19px)!important;color:#999aaa;margin:0!important}
+@media(max-width:650px){.reveal .pair{gap:10px}.reveal .type-card{padding:18px 9px}.reveal .types-grid{gap:6px}.reveal .type-chip{padding:10px 3px}}
+
+/* Full-slide QR reveal: final click after all 16 types */
+.reveal section.story.qr-slide{position:relative!important;overflow:hidden}
+.reveal .qr-overlay.fragment{position:absolute!important;inset:0!important;z-index:50;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:rgba(5,5,12,.96);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .55s ease,visibility .55s ease;margin:0!important;padding:24px!important;box-sizing:border-box}
+.reveal .qr-overlay.fragment.visible{opacity:1;visibility:visible;pointer-events:auto}
+.reveal .qr-overlay img{width:min(39vh,360px)!important;height:min(39vh,360px)!important;max-width:80vw!important;max-height:80vw!important;object-fit:contain;background:#fff;padding:15px;border-radius:20px;box-shadow:0 0 65px #ff59bf44;box-sizing:border-box;margin:0!important}
+.reveal .qr-overlay .qr-title{font-size:clamp(26px,3.5vw,48px)!important;font-weight:900;color:#fff;margin:0!important}
+.reveal .qr-overlay .qr-help{font-size:clamp(16px,1.6vw,23px)!important;color:#65e6ff;margin:0!important}
+
+/* 09: L/S songs */
+.reveal .song-slide{gap:14px!important;padding:3vh 5vw!important}
+.reveal .song-pair{display:grid;grid-template-columns:1fr 1fr;gap:26px;width:min(100%,1000px);margin:8px auto}
+.reveal .song-panel{background:linear-gradient(150deg,#ff59bf18,#65e6ff0d);border:1px solid #ffffff35;border-radius:24px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
+.reveal .song-panel:nth-child(2){background:linear-gradient(150deg,#65e6ff18,#ff59bf0d)}
+.reveal .song-type{font-size:clamp(22px,2.5vw,34px)!important;font-weight:900;margin:0!important;color:var(--pink)}
+.reveal .song-panel:nth-child(2) .song-type{color:var(--cyan)}
+.reveal .song-cover-btn{background:none;border:0;padding:0;cursor:pointer;position:relative;width:min(26vh,250px);height:min(26vh,250px);margin:0;display:block}
+.reveal .song-cover-btn img{width:100%;height:100%;object-fit:cover;border-radius:14px;box-shadow:0 10px 35px #0009;margin:0;max-width:none;max-height:none}
+.reveal .song-cover-btn::after{content:'▶';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:66px;height:66px;border-radius:50%;display:grid;place-items:center;background:#08080dcc;color:white;font-size:30px;box-shadow:0 0 25px #0008;transition:transform .2s}
+.reveal .song-cover-btn:hover::after{transform:translate(-50%,-50%) scale(1.15)}
+.reveal .song-title{font-size:clamp(20px,2vw,30px)!important;font-weight:800;margin:0!important;line-height:1.3}
+.reveal .song-artist{font-size:clamp(15px,1.4vw,21px)!important;color:#c9c9d4;margin:0!important}
+.reveal .song-hint{font-size:clamp(13px,1.2vw,17px)!important;color:#aaa;margin:0!important}
+.video-modal{position:fixed;inset:0;background:#05050af2;z-index:10000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:15px;padding:24px;box-sizing:border-box}
+.video-modal.open{display:flex}
+.video-modal-header{width:min(88vw,1100px);display:flex;justify-content:space-between;align-items:center;color:#fff;font-size:clamp(18px,2vw,26px);font-weight:800}
+.video-close{background:var(--pink);color:#08080d;border:0;border-radius:12px;font-size:20px;font-weight:900;padding:9px 18px;cursor:pointer}
+.video-frame{width:min(88vw,1100px);aspect-ratio:16/9;border:1px solid #ffffff44;border-radius:14px;background:#000}
+.video-external{color:var(--cyan);font-size:16px;text-decoration:underline}
+@media(max-height:650px){.reveal .song-panel{padding:12px;gap:5px}.reveal .song-cover-btn{width:min(22vh,190px);height:min(22vh,190px)}}
+
+
+/* SPOTIFY-INSPIRED REDESIGN / BLACK + ELECTRIC GREEN */
+:root{--pink:#1ed760;--cyan:#b7f55b;--green:#1ed760;--ink:#080a09;--muted:#a7b0a9}
+html,body{background:#080a09!important;color:#fff}
+.reveal{background:radial-gradient(ellipse at 75% 8%,#173e25 0%,#101712 29%,#080a09 72%)!important;font-family:'Arial','Apple SD Gothic Neo',sans-serif!important}
+.reveal .slides{top:50%!important}
+.reveal .slides section{padding-bottom:60px!important}
+.reveal .story{padding:8vh 8vw 11vh!important;gap:22px!important}
+.reveal .eyebrow{color:var(--green)!important;font-size:clamp(12px,1.2vw,17px)!important;letter-spacing:.26em!important;font-weight:900!important}
+.reveal .hero-line{font-size:clamp(40px,6.3vw,91px)!important;line-height:1.05!important;letter-spacing:-.065em!important;font-weight:950!important;text-wrap:balance}
+.reveal .accent,.reveal .cyan{color:var(--green)!important}
+.reveal .story-copy{color:#d9e1db!important;line-height:1.5!important}
+.reveal .small-question,.reveal .mini-note{color:#9baaa0!important}
+.reveal .pair{gap:18px!important;max-width:1080px!important;margin-top:14px!important}
+.reveal .type-card{position:relative;background:#1b211d!important;border:1px solid #3c4840!important;border-radius:9px!important;padding:30px 30px 34px!important;text-align:left!important;box-shadow:0 15px 55px #0005;overflow:hidden}
+.reveal .type-card:before{content:'◉';position:absolute;right:28px;top:20px;font-size:25px;color:#64776a}
+.reveal .type-card:first-child{background:linear-gradient(135deg,#1ed76022,#17221a)!important;border-color:#2d9e57!important}
+.reveal .type-card:last-child{background:linear-gradient(135deg,#2a352c,#141c17)!important;border-color:#46544a!important}
+.reveal .type-letter{color:#1ed760!important;font-size:clamp(86px,10vw,148px)!important;letter-spacing:-.09em!important}
+.reveal .type-card:last-child .type-letter{color:#f7faf7!important}
+.reveal .type-name{color:#fff!important;font-size:clamp(18px,2vw,27px)!important;letter-spacing:.06em}
+.reveal .type-desc{color:#c5d0c7!important}
+.reveal .type-chip{border:1px solid #354b3b!important;background:#1b261e!important;border-radius:5px!important;color:#f8fff9!important;padding:10px 5px!important;font-size:clamp(22px,2.7vw,37px)!important;box-shadow:inset 4px 0 0 #1ed760}
+.reveal .type-chip:nth-child(4n+2){background:#253329!important}
+.reveal .types-grid{gap:9px!important;margin:5px auto!important}
+.reveal .logo-character,.reveal .logo-bti{color:#1ed760!important}
+.reveal .logo-morph{filter:drop-shadow(0 0 35px #1ed76055)!important}
+.reveal .tagline{color:#eaffee!important;font-weight:800!important}
+.reveal .logo-credit{color:#a1afa3!important}
+.reveal .intro-caption{color:#1ed760!important}
+.reveal .qr-overlay.fragment{background:rgba(5,10,6,.98)!important;z-index:999!important}
+.reveal .qr-overlay img{border-radius:8px!important;box-shadow:0 0 0 10px #1ed76022,0 20px 65px #000!important}
+.reveal .qr-overlay .qr-help{color:#1ed760!important}
+.reveal .song-slide{padding:7vh 7vw 11vh!important;gap:13px!important}
+.reveal .song-slide .hero-line{font-size:clamp(40px,5vw,74px)!important}
+.reveal .song-pair{max-width:980px!important;gap:20px!important;margin:0 auto!important}
+.reveal .song-panel{border:1px solid #334538!important;background:linear-gradient(150deg,#1f3426,#171d19)!important;border-radius:9px!important;gap:8px!important;padding:20px!important;position:relative}
+.reveal .song-panel:nth-child(2){background:linear-gradient(150deg,#29372d,#171d19)!important}
+.reveal .song-type{color:#1ed760!important;font-size:clamp(19px,2vw,28px)!important;letter-spacing:-.02em}
+.reveal .song-panel:nth-child(2) .song-type{color:#fff!important}
+.reveal .song-cover-btn{width:min(26vh,240px)!important;height:min(26vh,240px)!important;z-index:2;pointer-events:auto!important}
+.reveal .song-cover-btn img{border-radius:3px!important}
+.reveal .song-cover-btn::after{background:#1ed760!important;color:#071108!important;width:68px!important;height:68px!important;font-size:28px!important;box-shadow:0 8px 28px #0009!important}
+.reveal .song-cover-btn:hover{transform:scale(1.025)}
+.reveal .song-hint{color:#1ed760!important;font-weight:900!important;letter-spacing:.08em!important}
+.reveal .song-title{color:#fff!important}
+.reveal .song-artist{color:#a6b3a8!important}
+.reveal a.direct-link{color:#fff!important;text-decoration:underline!important;font-size:13px!important;letter-spacing:.05em!important;position:relative;z-index:3}
+.video-modal{z-index:2147483647!important;background:#070b08f5!important}
+.video-close{background:#1ed760!important;border-radius:30px!important;color:#071208!important}
+.video-external{color:#1ed760!important}
+.app-top,.app-side,.app-bottom{position:fixed;z-index:90;pointer-events:none;font-family:Arial,'Apple SD Gothic Neo',sans-serif;box-sizing:border-box}
+.app-top{left:0;right:0;top:0;height:70px;padding:0 4.5vw;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #26332a;background:#090d0bdb;backdrop-filter:blur(8px);font-size:13px;font-weight:900;letter-spacing:.14em}
+.brand{display:flex;align-items:center;gap:12px;color:#f0f8f1}.brand-mark{display:grid;place-items:center;background:#1ed760;color:#061008;border-radius:50%;width:35px;height:35px;font-size:25px}.brand-dim{color:#76887b;font-weight:500}.app-top-right{display:flex;align-items:center;gap:13px;color:#c8d5cb}.live-dot{background:#1ed760;width:8px;height:8px;border-radius:50%;box-shadow:0 0 15px #1ed760}.edition{border:1px solid #36513d;padding:7px 11px;border-radius:25px;color:#1ed760;font-size:11px}
+.app-side{top:27%;left:2vw;display:flex;flex-direction:column;align-items:center;gap:22px;color:#67776b;writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;letter-spacing:.25em;font-weight:900}.side-active{color:#1ed760;font-size:19px}.side-rule{height:60px;width:1px;background:#35583e}
+.app-bottom{bottom:0;left:0;right:0;height:79px;background:#111713f5;border-top:1px solid #2a392e;display:flex;align-items:center;padding:0 3vw;gap:16px}.bottom-album{width:43px;height:43px;background:#1ed760;color:#0b170e;display:grid;place-items:center;font-size:29px;border-radius:3px}.bottom-track{display:flex;flex-direction:column;gap:5px;min-width:220px;max-width:42vw}.bottom-track strong{font-size:13px;color:white;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bottom-track small{font-size:9px;letter-spacing:.12em;color:#86988a}.bottom-controls{display:flex;gap:23px;align-items:center;color:#819589;font-size:15px;margin:auto}.bottom-play{width:34px;height:34px;background:#fff;color:#0d1510;border-radius:50%;display:grid;place-items:center;padding-left:2px}.bottom-progress{height:4px;background:#354438;border-radius:6px;width:19vw;overflow:hidden}.bottom-progress span{display:block;width:10%;height:100%;background:#1ed760;transition:width .4s}.bottom-time{font-size:11px;color:#bdcec0;letter-spacing:.1em;white-space:nowrap}
+.reveal .controls{bottom:83px!important;right:16px!important;color:#1ed760!important;z-index:95!important}
+.reveal .progress{display:none!important}
+@media(max-height:720px){.app-top{height:45px}.app-bottom{height:55px}.reveal .story{padding-top:6vh!important;padding-bottom:7vh!important;gap:12px!important}.reveal .hero-line{font-size:clamp(32px,5vw,65px)!important}.reveal .type-card{padding:15px!important}.reveal .type-letter{font-size:clamp(60px,8vw,100px)!important}.reveal .song-panel{padding:10px!important}.reveal .song-cover-btn{width:min(23vh,185px)!important;height:min(23vh,185px)!important}.reveal .controls{bottom:58px!important}}
+@media(max-width:750px){.app-side,.brand-dim,.edition,.bottom-controls{display:none}.app-top{height:48px;padding:0 15px}.app-bottom{height:58px;padding:0 12px}.bottom-progress{width:16vw}.bottom-track{min-width:0;max-width:55vw}.reveal .story{padding:7vh 5vw 10vh!important}.reveal .type-card{padding:13px!important}.reveal .type-letter{font-size:clamp(48px,12vw,90px)!important}.reveal .type-desc{font-size:13px!important}.reveal .song-pair{gap:8px!important}.reveal .song-panel{padding:10px!important}.reveal .song-cover-btn{width:min(23vh,37vw)!important;height:min(23vh,37vw)!important}.reveal .song-type{font-size:17px!important}.reveal .song-title{font-size:16px!important}}
+
+
+/* STABLE QUIZ SLIDES — no hidden overlay or fragment-driven slide replacement */
+.reveal .slides section.quiz-slide{display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;padding:78px 88px 96px!important;text-align:left!important;overflow:hidden!important}
+.reveal .quiz-body{width:min(100%,1050px);max-height:100%;display:flex;flex-direction:column;justify-content:center;gap:22px}
+.reveal .quiz-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;color:#1ed760;font-size:15px;font-weight:900;letter-spacing:.14em}
+.reveal .quiz-question{color:#fff!important;font-size:clamp(29px,3.4vw,52px)!important;line-height:1.2!important;font-weight:900!important;letter-spacing:-.045em!important;word-break:keep-all;margin:5px 0 10px!important}
+.reveal .quiz-answers{display:grid;gap:15px}
+.reveal .quiz-answer{background:linear-gradient(100deg,#203126,#18231c);border:1px solid #4c6653;border-radius:15px;min-height:100px;padding:14px 20px 14px 27px;display:flex;align-items:center;justify-content:space-between;gap:20px;color:#fff;font-size:clamp(18px,2vw,28px);line-height:1.3;font-weight:750;box-sizing:border-box}
+.reveal .quiz-letter{flex:none;width:64px;height:64px;display:grid;place-items:center;border-radius:50%;background:#1ed760;color:#08140b;font-size:38px;font-weight:950;line-height:1}
+.reveal .quiz-letter.fragment:not(.visible){opacity:0!important;visibility:hidden!important}
+.reveal .quiz-letter.fragment.visible{opacity:1!important;visibility:visible!important}
+.reveal .quiz-help{color:#a8b8ac!important;font-size:15px!important;letter-spacing:.05em;margin:5px 0 0!important}
+/* Reserve a reliable 70px header and 79px footer inside Reveal's 700px slide coordinates. */
+.reveal .slides section.story[data-state="lyrics-sound"],
+.reveal .slides section.story[data-state="familiar-novel"],
+.reveal .slides section.story[data-state="emotional-analytical"],
+.reveal .slides section.story[data-state="personal-communal"]{justify-content:center!important;gap:17px!important;padding:76px 80px 99px!important;overflow:hidden!important}
+.reveal .slides section.story[data-state="lyrics-sound"] .hero-line,
+.reveal .slides section.story[data-state="familiar-novel"] .hero-line,
+.reveal .slides section.story[data-state="emotional-analytical"] .hero-line,
+.reveal .slides section.story[data-state="personal-communal"] .hero-line{font-size:clamp(34px,4.5vw,64px)!important;line-height:1.12!important}
+.reveal .slides section.story[data-state="lyrics-sound"] .pair,
+.reveal .slides section.story[data-state="familiar-novel"] .pair,
+.reveal .slides section.story[data-state="emotional-analytical"] .pair,
+.reveal .slides section.story[data-state="personal-communal"] .pair{margin:8px auto 0!important;gap:18px!important;width:min(100%,880px)!important}
+.reveal .slides section.story[data-state="lyrics-sound"] .type-card,
+.reveal .slides section.story[data-state="familiar-novel"] .type-card,
+.reveal .slides section.story[data-state="emotional-analytical"] .type-card,
+.reveal .slides section.story[data-state="personal-communal"] .type-card{padding:16px 22px!important}
+.reveal .slides section.story[data-state="lyrics-sound"] .type-letter,
+.reveal .slides section.story[data-state="familiar-novel"] .type-letter,
+.reveal .slides section.story[data-state="emotional-analytical"] .type-letter,
+.reveal .slides section.story[data-state="personal-communal"] .type-letter{font-size:clamp(60px,7vw,104px)!important;line-height:1!important}
+.reveal .slides section.story[data-state="lyrics-sound"] .type-name,
+.reveal .slides section.story[data-state="familiar-novel"] .type-name,
+.reveal .slides section.story[data-state="emotional-analytical"] .type-name,
+.reveal .slides section.story[data-state="personal-communal"] .type-name{font-size:clamp(19px,2vw,28px)!important;margin:6px 0!important}
+.reveal .slides section.story[data-state="lyrics-sound"] .type-desc,
+.reveal .slides section.story[data-state="familiar-novel"] .type-desc,
+.reveal .slides section.story[data-state="emotional-analytical"] .type-desc,
+.reveal .slides section.story[data-state="personal-communal"] .type-desc{font-size:clamp(15px,1.5vw,20px)!important;margin:5px 0!important}
+@media(max-height:760px){.reveal .slides section.quiz-slide{padding:62px 70px 76px!important}.reveal .quiz-body{gap:13px}.reveal .quiz-answer{min-height:74px;padding:10px 15px}.reveal .quiz-letter{width:48px;height:48px;font-size:30px}.reveal .slides section.story[data-state]{gap:10px!important}}
+
+/* Topster: always fit between Spotify header and player, with breathing room. */
+.reveal .slides section.opening[data-state="topster"]{padding:88px 85px 100px!important;box-sizing:border-box!important;overflow:hidden!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.reveal .slides section.opening[data-state="topster"] .full-topster{display:block!important;width:auto!important;height:auto!important;max-width:min(1050px,82vw)!important;max-height:calc(100vh - 215px)!important;object-fit:contain!important;margin:0 auto!important;flex-shrink:1!important}
+@media(max-height:720px){.reveal .slides section.opening[data-state="topster"]{padding-top:60px!important;padding-bottom:70px!important}.reveal .slides section.opening[data-state="topster"] .full-topster{max-height:calc(100vh - 145px)!important}}
+
+/* Topster reprise: pixel-accurate overlays on the user-supplied image. */
+.reveal .slides section.member-topster-slide{padding:76px 45px 96px!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}
+.member-topster-stage{position:relative!important;display:block!important;width:min(1260px,85vw,calc((100vh - 212px)*1.50175))!important;aspect-ratio:1712 / 1140!important;max-height:calc(100vh - 212px)!important;margin:0 auto!important;flex-shrink:0!important}
+.member-topster-image{width:100%!important;height:100%!important;display:block!important;object-fit:contain!important;max-width:none!important;max-height:none!important;margin:0!important;border:0!important;box-shadow:none!important}
+.member-type-overlays{position:absolute;inset:0;pointer-events:none}
+.member-type-label{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;gap:0;min-width:5.2%;padding:.38% .7%;box-sizing:border-box;background:rgba(5,16,10,.86);border:1px solid rgba(30,215,96,.9);border-radius:8px;color:#fff;font-family:Arial,'Apple SD Gothic Neo',sans-serif;font-size:clamp(13px,1.55vw,25px)!important;font-weight:900;line-height:1.3;letter-spacing:.035em;box-shadow:0 4px 20px #000a,0 0 10px #1ed76030;white-space:nowrap}
+.member-type-label.fragment:not(.visible){opacity:0!important;visibility:hidden!important}
+.member-type-label.fragment.visible{opacity:1!important;visibility:visible!important}
+.member-type-label .f-letter{display:inline-block;color:#1ed760;transform:scale(1);transform-origin:center;transition:transform .7s cubic-bezier(.2,1.6,.3,1),text-shadow .7s;will-change:transform}
+.member-topster-slide.f-emphasis .member-type-label .f-letter{transform:scale(1.6);text-shadow:0 0 12px #1ed760aa}
+.member-f-trigger{position:absolute;opacity:0!important;pointer-events:none}
+@media(max-width:800px){.member-type-label{font-size:clamp(9px,1.5vw,16px)!important;border-radius:4px}}
+</style>
+<style>
+/* Keep new E/A panels consistent with the original L/S slide. */
+.reveal section[data-state="ea-songs"] .song-panel{background:linear-gradient(145deg,#153923,#13231a)!important;border-color:#346d47!important}
+.reveal section[data-state="ea-songs"] .song-panel:nth-child(2){background:linear-gradient(145deg,#1c2d24,#15251d)!important}
+.reveal section[data-state="ea-songs"] .song-type{color:#1ed760!important}
+.reveal section[data-state="ea-songs"] .song-title{word-break:keep-all}
+
+/* Topster: always fit between Spotify header and player, with breathing room. */
+.reveal .slides section.opening[data-state="topster"]{padding:88px 85px 100px!important;box-sizing:border-box!important;overflow:hidden!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.reveal .slides section.opening[data-state="topster"] .full-topster{display:block!important;width:auto!important;height:auto!important;max-width:min(1050px,82vw)!important;max-height:calc(100vh - 215px)!important;object-fit:contain!important;margin:0 auto!important;flex-shrink:1!important}
+@media(max-height:720px){.reveal .slides section.opening[data-state="topster"]{padding-top:60px!important;padding-bottom:70px!important}.reveal .slides section.opening[data-state="topster"] .full-topster{max-height:calc(100vh - 145px)!important}}
+</style>
+<style id="topster-final-layout-fix">
+/* The topster and all 16 labels share one fixed 1712:1140 coordinate space. */
+.reveal .slides section.member-topster-slide {
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  padding:75px 35px 82px!important;overflow:hidden!important;
+}
+.reveal .slides section.member-topster-slide .member-topster-stage {
+  position:relative!important;
+  display:block!important;
+  width:810px!important;
+  height:539.37px!important;
+  min-width:810px!important;
+  min-height:539.37px!important;
+  max-width:810px!important;
+  max-height:539.37px!important;
+  flex:none!important;
+  margin:0 auto!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+  aspect-ratio:auto!important;
+  background-image:url("assets/topster.png")!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+}
+.reveal .slides section.member-topster-slide .member-topster-image {
+  display:none!important;
+}
+.reveal .slides section.member-topster-slide .member-type-overlays {
+  position:absolute!important;inset:0!important;
+  width:100%!important;height:100%!important;
+  margin:0!important;padding:0!important;
+  pointer-events:none!important;
+}
+.reveal .slides section.member-topster-slide .member-type-label {
+  position:absolute!important;
+  transform:translate(-50%,-50%)!important;
+  margin:0!important;
+  font-size:18px!important;
+  line-height:1.1!important;
+  padding:5px 7px!important;
+}
+/* Opening topster stays within the header/player safe area. */
+.reveal .slides section.opening[data-state="topster"] {
+  padding:78px 45px 84px!important;
+  overflow:hidden!important;
+}
+.reveal .slides section.opening[data-state="topster"] .full-topster {
+  max-width:795px!important;
+  max-height:520px!important;
+  width:auto!important;
+  height:auto!important;
+  object-fit:contain!important;
+}
+</style>
+
+<style id="opening-cover-grid-repair">
+/* Correct crops are independent album squares, not slices of the full topster. */
+.reveal .slides section.opening[data-state="covers"] {
+  padding:90px 45px 95px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  overflow:hidden!important;
+}
+.reveal .slides section.opening[data-state="covers"] .topster-grid {
+  display:grid!important;
+  grid-template-columns:repeat(4, 126px)!important;
+  grid-template-rows:repeat(4, 126px)!important;
+  gap:9px!important;
+  width:531px!important;
+  height:531px!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0 auto!important;
+  padding:0!important;
+  flex:none!important;
+  align-content:center!important;
+  justify-content:center!important;
+}
+.reveal .slides section.opening[data-state="covers"] .topster-grid img.cover {
+  display:block!important;
+  width:126px!important;
+  height:126px!important;
+  min-width:126px!important;
+  min-height:126px!important;
+  max-width:126px!important;
+  max-height:126px!important;
+  aspect-ratio:1!important;
+  object-fit:cover!important;
+  margin:0!important;
+  padding:0!important;
+}
+</style>
+<style id="f-analysis-style">
+.reveal .slides section.f-analysis-slide{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:center!important;gap:17px!important;padding:90px 72px 98px!important;box-sizing:border-box!important;text-align:left!important;overflow:hidden!important}
+.reveal .f-analysis-slide .fa-kicker{color:#1ed760!important;font-size:16px!important;letter-spacing:.22em;font-weight:800;margin:0!important}
+.reveal .f-analysis-slide .fa-head{font-size:51px!important;line-height:1.13!important;font-weight:900!important;margin:0 0 7px!important;letter-spacing:-.045em}
+.reveal .f-analysis-slide .fa-head em{color:#1ed760;font-style:normal}
+.reveal .f-analysis-slide .fa-sub{font-size:19px!important;color:#b5c3b9!important;margin:0!important}
+.reveal .f-analysis-slide .fa-panels{display:grid!important;grid-template-columns:1fr 1fr!important;gap:17px!important;width:100%!important;margin:7px 0!important}
+.reveal .f-analysis-slide .fa-panel{border:1px solid #34503e;background:linear-gradient(145deg,#203429,#121c16);border-radius:16px;padding:20px 22px 21px;min-width:0}
+.reveal .f-analysis-slide .fa-q{font-size:13px!important;letter-spacing:.15em;color:#1ed760!important;font-weight:800;margin:0 0 8px!important}
+.reveal .f-analysis-slide .fa-question{font-size:21px!important;font-weight:800!important;line-height:1.35!important;margin:0 0 22px!important;min-height:58px}
+.reveal .f-analysis-slide .fa-meter{height:23px;border-radius:99px;overflow:hidden;display:flex;background:#55635a;margin:0 0 15px}
+.reveal .f-analysis-slide .fa-f{height:100%;background:#1ed760}
+.reveal .f-analysis-slide .fa-n{height:100%;background:#718078}
+.reveal .f-analysis-slide .fa-stats{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.reveal .f-analysis-slide .fa-stat{font-size:14px!important;line-height:1.35!important;color:#d6ded8!important;margin:0!important}
+.reveal .f-analysis-slide .fa-stat strong{display:block;font-size:29px!important;color:#1ed760!important;margin-bottom:4px}
+.reveal .f-analysis-slide .fa-stat.secondary{text-align:right;color:#9aa99f!important}
+.reveal .f-analysis-slide .fa-stat.secondary strong{color:#9aa99f!important}
+.reveal .f-analysis-slide .fa-conclusion{font-size:23px!important;line-height:1.35!important;font-weight:800!important;color:#fff!important;border-left:5px solid #1ed760;padding:7px 0 7px 19px;margin:7px 0 0!important}
+.reveal .f-analysis-slide .fa-foot{font-size:12px!important;color:#87978c!important;margin:0!important}
+</style>
+<style id="final-message-design">
+.reveal .slides section.final-message-slide{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;padding:85px 65px 100px!important;overflow:hidden!important;text-align:center!important;gap:0!important;background:radial-gradient(ellipse at 50% 55%,#163d28 0%,#0d1d14 42%,#080d0a 78%)!important}
+.reveal .final-message-slide .fm-kicker{font-size:15px!important;letter-spacing:.32em!important;font-weight:800!important;color:#1ed760!important;margin:0 0 24px!important}
+.reveal .final-message-slide .fm-first{font-size:34px!important;line-height:1.42!important;letter-spacing:-.045em!important;font-weight:750!important;color:#e9f3eb!important;margin:0!important;word-break:keep-all!important}
+.reveal .final-message-slide .fm-first strong{color:#1ed760!important;font-weight:950!important}
+.reveal .final-message-slide .fm-break{width:76px;height:3px;background:#1ed760;margin:27px auto!important;border-radius:9px;box-shadow:0 0 19px #1ed76077}
+.reveal .final-message-slide .fm-question{font-size:39px!important;line-height:1.4!important;color:#d9e4dc!important;font-weight:750!important;letter-spacing:-.035em!important;margin:0!important;word-break:keep-all!important}
+.reveal .final-message-slide .fm-question .fm-others{color:#fff!important;text-decoration:underline;text-decoration-color:#69796c;text-underline-offset:7px}
+.reveal .final-message-slide .fm-question .fm-me{color:#1ed760!important;text-decoration:underline;text-decoration-color:#1ed760;text-underline-offset:7px}
+.reveal .final-message-slide .fm-last{font-size:42px!important;line-height:1.32!important;letter-spacing:-.05em!important;font-weight:950!important;color:#fff!important;margin:22px 0 0!important;word-break:keep-all!important}
+.reveal .final-message-slide .fm-last .fm-key{color:#1ed760!important;display:inline-block!important;filter:drop-shadow(0 0 18px #1ed76044)}
+.reveal .final-message-slide .fm-last.fragment.visible .fm-key{animation:fm-key-pulse 1.15s cubic-bezier(.2,1.2,.3,1) both}
+@keyframes fm-key-pulse{0%{transform:scale(.8);opacity:.15;filter:blur(8px)}55%{transform:scale(1.11);opacity:1;filter:drop-shadow(0 0 24px #1ed76099)}100%{transform:scale(1);opacity:1;filter:drop-shadow(0 0 15px #1ed76055)}}
+.reveal .final-message-slide .fm-finale{position:absolute!important;inset:0!important;z-index:15!important;background:#1ed760!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;padding:85px 65px 100px!important;box-sizing:border-box!important;gap:15px!important}
+.reveal .final-message-slide .fm-finale .fm-final-label{font-size:16px!important;letter-spacing:.33em!important;font-weight:900!important;color:#0c2415!important;margin:0!important}
+.reveal .final-message-slide .fm-finale .fm-final-text{font-size:55px!important;line-height:1.34!important;letter-spacing:-.065em!important;font-weight:950!important;color:#06160d!important;margin:0!important;word-break:keep-all!important}
+.reveal .final-message-slide .fm-finale .fm-final-text b{color:#fff!important;text-shadow:0 3px 0 #07512733}
+.reveal .final-message-slide .fm-finale .fm-final-credit{font-size:14px!important;letter-spacing:.16em!important;color:#0b4124!important;font-weight:800!important;margin:12px 0 0!important}
+</style>
+<style id="unknown-ending-style">
+/* Closing frame: press SPACE once to morph 남의 무지 -> 나의 미지 */
+.reveal .slides section.unknown-ending{display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;padding:90px 60px 105px!important;overflow:hidden!important;background:#07100b!important;text-align:center!important}
+.reveal .unknown-ending .unknown-center{position:relative!important;width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important}
+.reveal .unknown-ending .unknown-phrase{display:flex!important;gap:.36em!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important;font-size:clamp(76px,11vw,158px)!important;line-height:1.3!important;font-weight:950!important;letter-spacing:-.075em!important;color:#f5faf6!important}
+.reveal .unknown-ending .unknown-word{display:inline-flex!important;position:relative!important;align-items:baseline!important}
+.reveal .unknown-ending .old-letter,.reveal .unknown-ending .new-letter{display:inline-block!important;transition:opacity .6s ease,transform .8s cubic-bezier(.2,.8,.2,1),filter .6s ease!important}
+.reveal .unknown-ending .old-letter{color:#f5faf6!important;opacity:1!important;transform:translateY(0) scale(1)!important;filter:blur(0)!important}
+.reveal .unknown-ending .new-letter{position:absolute!important;left:0!important;top:0!important;color:#1ed760!important;opacity:0!important;transform:translateY(45%) scale(.65)!important;filter:blur(12px)!important}
+.reveal .unknown-ending:has(.unknown-morph-trigger.visible) .old-letter{opacity:0!important;transform:translateY(-48%) scale(.72)!important;filter:blur(12px)!important}
+.reveal .unknown-ending:has(.unknown-morph-trigger.visible) .new-letter{opacity:1!important;transform:translateY(0) scale(1)!important;filter:blur(0)!important}
+.reveal .unknown-ending:has(.unknown-morph-trigger.visible) .unknown-phrase{filter:drop-shadow(0 0 22px #1ed76028)}
+.reveal .unknown-ending .unknown-morph-trigger{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+@media(max-width:850px){.reveal .unknown-ending .unknown-phrase{font-size:clamp(48px,10vw,90px)!important}}
+</style>
+
+<style id="closing-logo-style">
+.reveal .slides section.closing-logo-slide {
+  display:flex!important;flex-direction:column!important;align-items:center!important;
+  justify-content:center!important;box-sizing:border-box!important;
+  padding:105px 60px 115px!important;overflow:hidden!important;
+  background:#07100b!important;text-align:center!important;
+}
+.reveal .closing-logo-stage{min-height:250px!important;margin:0 auto!important}
+.reveal .closing-logo-slide .logo-character{color:#1ed760!important;font-size:170px!important}
+.reveal .closing-logo-slide .logo-bti{color:#1ed760!important;font-size:155px!important}
+.reveal .closing-logo-slide .logo-morph{filter:drop-shadow(0 0 24px #1ed76030)!important}
+.reveal .closing-logo-slide .logo-subtitle{font-size:22px!important;letter-spacing:.22em!important;margin:18px 0 0!important}
+.reveal .closing-logo-slide .logo-credit{font-size:13px!important;letter-spacing:.28em!important;margin:18px 0 0!important}
+.reveal .closing-logo-slide .logo-morph.is-final .logo-character,
+.reveal .closing-logo-slide .logo-morph.is-final .logo-bti{filter:drop-shadow(0 0 25px #1ed76088)!important}
+</style>
+<style id="korean-copy-fit">
+.reveal .logo-subtitle{font-size:clamp(15px,1.5vw,22px)!important;letter-spacing:.045em!important;white-space:normal!important;max-width:1050px!important;line-height:1.4!important}
+.reveal .slides section.closing-logo-slide .logo-subtitle{font-size:clamp(15px,1.5vw,22px)!important;letter-spacing:.045em!important}
+</style>
+<style id="presenter-label-style">
+.reveal .logo-presenter{opacity:0;transform:translateY(12px);transition:opacity .6s,transform .6s;color:#d5e5da;font-size:20px;font-weight:600;letter-spacing:.08em;margin-top:18px;text-align:center}
+.reveal .logo-presenter.visible{opacity:1;transform:translateY(0)}
+</style><style id="direct-youtube-links">
+.reveal .song-panel .song-youtube-cta{display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;align-self:center!important;box-sizing:border-box!important;width:min(94%,380px)!important;padding:13px 18px!important;margin:14px auto 0!important;border-radius:999px!important;background:#1ed760!important;color:#06170b!important;font-size:clamp(14px,1.3vw,19px)!important;font-weight:800!important;text-decoration:none!important;letter-spacing:0!important;box-shadow:0 6px 26px #1ed76026!important;transition:transform .15s ease,background .15s ease!important}
+.reveal .song-panel .song-youtube-cta:hover{background:#57f48b!important;transform:translateY(-2px)!important}
+.reveal .song-panel a.song-cover-btn{display:block!important;cursor:pointer!important;text-decoration:none!important}
+.reveal .song-panel .song-hint{font-size:clamp(11px,1vw,14px)!important}
+</style></head>
+<body>
+<div aria-hidden="true" class="app-top"><div class="brand"><span class="brand-mark">◉</span> MACBAK <span class="brand-dim">/ 음악문화 연구회</span></div><div class="app-top-right"><span class="live-dot"></span> 음BTI RADIO <span class="edition">2026 EDITION</span></div></div>
+<div aria-hidden="true" class="app-side"><span class="side-active">01</span><span class="side-rule"></span><span>PLAYLIST</span><span>YOUR TYPE</span><span>DISCOVER</span></div>
+<div aria-hidden="true" class="app-bottom"><div class="bottom-album">♫</div><div class="bottom-track"><strong id="currentTrack">음BTI — YOUR MUSIC TYPE</strong><small>MACBAK · CURATED LISTENING EXPERIENCE</small></div><div class="bottom-controls"><span>⏮</span><span class="bottom-play">▶</span><span>⏭</span></div><div class="bottom-progress"><span id="deckProgress"></span></div><span class="bottom-time" id="deckPage">01 / 10</span></div>
+<div class="reveal"><div class="slides">
+<section class="opening" data-state="covers">
+<div class="topster-grid" id="grid"></div>
+</section>
+<section class="opening" data-state="topster"><img alt="16개 앨범과 곡 목록이 있는 탑스터" class="full-topster" id="full" src="assets/topster.png"/></section>
+<section class="opening" data-state="logo">
+<div class="logo-stage"><div aria-label="음BTI" class="logo-morph" id="logoMorph"><span class="logo-character" id="logoCharacter">音</span><span class="logo-bti">BTI</span></div></div>
+<p class="tagline logo-subtitle" id="logoTagline">당신은 어떤 방식으로 음악을 좋아하시나요?</p>
+<p class="logo-credit" id="logoCredit">MACBAK 음악문화 연구회</p>
+<p class="logo-presenter" id="logoPresenter">발표자 · 이민하</p>
+</section>
+<!-- 03: WHY -->
+<section class="story" data-state="why">
+<p class="eyebrow">03</p>
+<h2 class="hero-line fragment fade-up">같은 음악을 들어도</h2>
+<h2 class="hero-line accent fragment fade-up">우리는 다르게 듣는다.</h2>
+<p class="story-copy fragment fade-up">누군가는 가사를, 누군가는 사운드를.<br/>누군가는 추억을, 누군가는 새로운 발견을.</p>
+<p class="small-question fragment fade-in">그 차이를 네 가지 기준으로 나눠보면 어떨까?</p>
+</section>
+<!-- 04: L/S -->
+<section aria-label="Q2 음악 성향 질문" class="quiz-slide" data-state="quiz-2">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 02</span></div>
+<h2 class="quiz-question">처음 듣는 노래가 마음에 들었을 때 가장 먼저 궁금한 것은?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>가사가 어떤 이야기를 하고 있는지</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">L</strong></div>
+<div class="quiz-answer"><span>어떤 악기와 소리로 만들어졌는지</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">S</strong></div>
+</div>
+
+</div>
+</section>
+<section aria-label="Q6 음악 성향 질문" class="quiz-slide" data-state="quiz-6">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 06</span></div>
+<h2 class="quiz-question">공연을 볼 때 가장 기다려지는 순간은?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>좋아하는 가사를 다 같이 따라 부르는 순간</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">L</strong></div>
+<div class="quiz-answer"><span>좋아하는 악기 파트가 라이브로 터지는 순간</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">S</strong></div>
+</div>
+
+</div>
+</section>
+<section class="story" data-state="lyrics-sound">
+<p class="eyebrow">04</p>
+<h2 class="hero-line">무엇에 먼저 <span class="accent">귀를 기울이는가?</span></h2>
+<div class="pair">
+<div class="type-card fragment fade-right"><p class="type-letter">L</p><p class="type-name">LYRICS</p><p class="type-desc">가사와 이야기, 말의 의미에 집중</p></div>
+<div class="type-card fragment fade-left"><p class="type-letter">S</p><p class="type-name">SOUND</p><p class="type-desc">멜로디와 악기, 음색과 리듬에 집중</p></div>
+</div>
+</section>
+<!-- 05: F/N -->
+<section aria-label="Q3 음악 성향 질문" class="quiz-slide" data-state="quiz-3">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 03</span></div>
+<h2 class="quiz-question">플레이리스트를 만들 때 더 많이 담는 곡은?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>오랫동안 좋아해 온 곡</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">F</strong></div>
+<div class="quiz-answer"><span>최근에 새롭게 발견한 곡</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">N</strong></div>
+</div>
+
+</div>
+</section>
+<section aria-label="Q7 음악 성향 질문" class="quiz-slide" data-state="quiz-7">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 07</span></div>
+<h2 class="quiz-question">음악 앱에서 더 자주 누르는 것은?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>내 플레이리스트나 좋아요 목록</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">F</strong></div>
+<div class="quiz-answer"><span>추천 믹스나 새로운 발매 목록</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">N</strong></div>
+</div>
+
+</div>
+</section>
+<section aria-label="Q11 음악 성향 질문" class="quiz-slide" data-state="quiz-11">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 11</span></div>
+<h2 class="quiz-question">추천받은 노래가 처음에 별로였다면?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>익숙한 내 취향의 노래로 돌아간다</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">F</strong></div>
+<div class="quiz-answer"><span>몇 번 더 들어보며 새로운 매력을 찾아본다</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">N</strong></div>
+</div>
+
+</div>
+</section>
+<section class="story" data-state="familiar-novel">
+<p class="eyebrow">05</p>
+<h2 class="hero-line">익숙함이 좋을까, <span class="cyan">새로움이 좋을까?</span></h2>
+<div class="pair">
+<div class="type-card fragment fade-right"><p class="type-letter">F</p><p class="type-name">FAMILIAR</p><p class="type-desc">좋아하던 곡을 다시 듣고 깊이 즐기기</p></div>
+<div class="type-card fragment fade-left"><p class="type-letter">N</p><p class="type-name">NOVEL</p><p class="type-desc">모르는 음악을 찾아 새롭게 탐색하기</p></div>
+</div>
+</section>
+<!-- 06: E/A -->
+<section aria-label="Q4 음악 성향 질문" class="quiz-slide" data-state="quiz-4">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 04</span></div>
+<h2 class="quiz-question">노래가 끝난 직후 더 자주 드는 생각은?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>와 이 노래가 주는 느낌이 너무 좋다</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">E</strong></div>
+<div class="quiz-answer"><span>와 이 부분을 이렇게 만들다니 재밌다</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">A</strong></div>
+</div>
+
+</div>
+</section>
+<section aria-label="Q8 음악 성향 질문" class="quiz-slide" data-state="quiz-8">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 08</span></div>
+<h2 class="quiz-question">같은 노래를 여러 번 듣는 이유는?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>처음 들을 때 느꼈던 감정을 다시 느끼고 싶어서</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">E</strong></div>
+<div class="quiz-answer"><span>들을 때마다 새로운 요소가 발견되는 것이 재밌어서</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">A</strong></div>
+</div>
+
+</div>
+</section>
+<section aria-label="Q12 음악 성향 질문" class="quiz-slide" data-state="quiz-12">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 12</span></div>
+<h2 class="quiz-question">음악을 듣다가 소름이 돋는 순간은?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>감정이 점점 쌓이다 폭발하는 순간</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">E</strong></div>
+<div class="quiz-answer"><span>예상 못 한 전조나 리듬 변화가 나오는 순간</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">A</strong></div>
+</div>
+
+</div>
+</section>
+<section class="story" data-state="emotional-analytical">
+<p class="eyebrow">06</p>
+<h2 class="hero-line">음악을 <span class="accent">느끼는 방식</span></h2>
+<div class="pair">
+<div class="type-card fragment fade-right"><p class="type-letter">E</p><p class="type-name">EMOTIONAL</p><p class="type-desc">감정과 기억에 몰입하며 감상</p></div>
+<div class="type-card fragment fade-left"><p class="type-letter">A</p><p class="type-name">ANALYTICAL</p><p class="type-desc">구조와 편곡, 디테일을 살피며 감상</p></div>
+</div>
+</section>
+<!-- 07: P/C -->
+<section aria-label="Q5 음악 성향 질문" class="quiz-slide" data-state="quiz-5">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 05</span></div>
+<h2 class="quiz-question">친구가 내 인생곡을 별로라고 한다면?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>그럴 수 있지, 나한테 좋으면 됐지</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">P</strong></div>
+<div class="quiz-answer"><span>어떤 점이 별로였는지 이야기해 보고 싶다</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">C</strong></div>
+</div>
+
+</div>
+</section>
+<section aria-label="Q9 음악 성향 질문" class="quiz-slide" data-state="quiz-9">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 09</span></div>
+<h2 class="quiz-question">음악 취향이 비슷한 사람을 만났을 때 나는?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>반갑지만 각자의 취향으로 남아도 좋다</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">P</strong></div>
+<div class="quiz-answer"><span>서로에게 곡을 추천하며 교류하고 싶다</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">C</strong></div>
+</div>
+
+</div>
+</section>
+<section aria-label="Q13 음악 성향 질문" class="quiz-slide" data-state="quiz-13">
+<div class="quiz-body">
+<div class="quiz-heading"><span>음BTI / QUESTION 13</span></div>
+<h2 class="quiz-question">음악과 관련해 더 소중한 기억은?</h2>
+<div class="quiz-answers">
+<div class="quiz-answer"><span>혼자 들으며 위로받았던 순간</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">P</strong></div>
+<div class="quiz-answer"><span>사람들과 한 마음으로 노래했던 순간</span><strong class="quiz-letter fragment fade-in" data-fragment-index="0">C</strong></div>
+</div>
+
+</div>
+</section>
+<section class="story" data-state="personal-communal">
+<p class="eyebrow">07</p>
+<h2 class="hero-line">음악을 즐기는 <span class="cyan">공간</span></h2>
+<div class="pair">
+<div class="type-card fragment fade-right"><p class="type-letter">P</p><p class="type-name">PERSONAL</p><p class="type-desc">혼자 듣고 나만의 경험으로 간직하기</p></div>
+<div class="type-card fragment fade-left"><p class="type-letter">C</p><p class="type-name">COMMUNAL</p><p class="type-desc">함께 듣고 이야기하며 공유하기</p></div>
+</div>
+</section>
+<!-- 08: 16 TYPES -->
+<section class="story qr-slide" data-state="sixteen">
+<p class="eyebrow">08 / 음BTI</p>
+<h2 class="hero-line"><span class="accent">4가지 지표</span>가 모이면?</h2>
+<div class="types-grid" id="typesGrid"></div>
+
+<div class="qr-overlay fragment" data-fragment-index="16">
+<p class="qr-title">나의 음BTI는?</p>
+<a aria-label="음BTI 검사 열기" href="https://smore.im/quiz/qYxLOWytgI" rel="noopener noreferrer" target="_blank">
+<img alt="음BTI 검사 QR코드" src="assets/musicbti_qr.png"/>
+</a>
+<p class="qr-help">QR코드를 스캔해 나의 음BTI 확인하기</p>
+</div>
+</section>
+<!-- 09: L/S SONG ANALYSIS -->
+<section class="story song-slide" data-state="ls-songs">
+<p class="eyebrow">09 / NOW PLAYING — LYRICS VS SOUND</p>
+<h2 class="hero-line"><span class="accent">L</span>과 <span class="cyan">S</span>가 사랑하는 노래</h2>
+<div class="song-pair">
+<article class="song-panel fragment fade-up">
+<p class="song-type">L이 사랑하는 노래</p>
+<a class="song-cover-btn" href="https://youtu.be/UPhCaUl_VCE?t=68" target="_blank" rel="noopener noreferrer" aria-label="L 음악 YouTube에서 재생하기"><img alt="신인류 날씨의 요정 앨범 커버" src="assets/ls_L.png"/></a>
+<p class="song-title">날씨의 요정</p><p class="song-artist">신인류</p>
+<p class="song-hint">앨범 커버 또는 아래 버튼 클릭 · 01:08</p><a class="direct-link song-youtube-cta" href="https://youtu.be/UPhCaUl_VCE?t=68" target="_blank" rel="noopener noreferrer">▶ YouTube에서 재생하기 ↗</a>
+</article>
+<article class="song-panel fragment fade-up">
+<p class="song-type">S가 사랑하는 노래</p>
+<a class="song-cover-btn" href="https://youtu.be/8la0W5wYMkY?si=D4lXc4jGxXpZZINU&t=120" target="_blank" rel="noopener noreferrer" aria-label="S 음악 YouTube에서 재생하기"><img alt="Lorde Current Affairs 앨범 커버" src="assets/ls_S.png"/></a>
+<p class="song-title">Current Affairs</p><p class="song-artist">Lorde</p>
+<p class="song-hint">앨범 커버 또는 아래 버튼 클릭 · 02:00</p><a class="direct-link song-youtube-cta" href="https://youtu.be/8la0W5wYMkY?si=D4lXc4jGxXpZZINU&t=120" target="_blank" rel="noopener noreferrer">▶ YouTube에서 재생하기 ↗</a>
+</article>
+</div>
+</section><section class="story song-slide" data-state="ea-songs">
+<p class="eyebrow">10 / NOW PLAYING — EMOTIONAL VS ANALYTICAL</p>
+<h2 class="hero-line"><span class="accent">E</span>와 <span class="cyan">A</span>가 사랑하는 노래</h2>
+<div class="song-pair">
+<article class="song-panel fragment fade-up">
+<p class="song-type">E가 사랑하는 노래</p>
+<a class="song-cover-btn" href="https://youtu.be/dsITkl8yx2g?si=Gdb1NwZLWUU6P7yQ&t=195" target="_blank" rel="noopener noreferrer" aria-label="E 음악 YouTube에서 재생하기"><img alt="GING NANG BOYZ I Don't Wanna Die 앨범 커버" src="assets/ea_E.png"/></a>
+<p class="song-title">I Don't Wanna Die</p><p class="song-artist">GING NANG BOYZ</p>
+<p class="song-hint">앨범 커버 또는 아래 버튼 클릭 · 03:15</p><a class="direct-link song-youtube-cta" href="https://youtu.be/dsITkl8yx2g?si=Gdb1NwZLWUU6P7yQ&t=195" target="_blank" rel="noopener noreferrer">▶ YouTube에서 재생하기 ↗</a>
+</article>
+<article class="song-panel fragment fade-up">
+<p class="song-type">A가 사랑하는 노래</p>
+<a class="song-cover-btn" href="https://youtu.be/XlcKiizWQVI?t=220" target="_blank" rel="noopener noreferrer" aria-label="A 음악 YouTube에서 재생하기"><img alt="Shaun Martin The Yellow Jacket 앨범 커버" src="assets/ea_A.png"/></a>
+<p class="song-title">The Yellow Jacket</p><p class="song-artist">Shaun Martin</p>
+<p class="song-hint">앨범 커버 또는 아래 버튼 클릭 · 03:40</p><a class="direct-link song-youtube-cta" href="https://youtu.be/XlcKiizWQVI?t=220" target="_blank" rel="noopener noreferrer">▶ YouTube에서 재생하기 ↗</a>
+</article>
+</div>
+</section>
+<!-- 11: P/C SONG ANALYSIS -->
+<section class="story song-slide" data-state="pc-songs">
+<p class="eyebrow">11 / NOW PLAYING — PERSONAL VS COMMUNAL</p>
+<h2 class="hero-line"><span class="accent">P</span>와 <span class="cyan">C</span>가 사랑하는 노래</h2>
+<div class="song-pair">
+<article class="song-panel fragment fade-up">
+<p class="song-type">P가 사랑하는 노래</p>
+<a class="song-cover-btn" href="https://youtu.be/Oq-lNJaJ1eQ?si=5L1TKPPG1h8p4Ypr" target="_blank" rel="noopener noreferrer" aria-label="P 음악 YouTube에서 재생하기"><img alt="검정치마 피와 갈증 앨범 커버" src="assets/pc_P.png"/></a>
+<p class="song-title">피와 갈증</p><p class="song-artist">검정치마</p>
+<p class="song-hint">앨범 커버 또는 아래 버튼 클릭 · 처음부터</p><a class="direct-link song-youtube-cta" href="https://youtu.be/Oq-lNJaJ1eQ?si=5L1TKPPG1h8p4Ypr" target="_blank" rel="noopener noreferrer">▶ YouTube에서 재생하기 ↗</a>
+</article>
+<article class="song-panel fragment fade-up">
+<p class="song-type">C가 사랑하는 노래</p>
+<a class="song-cover-btn" href="https://youtu.be/hFk2n_iPLO4?si=BmvXdiQ45Or80xhm" target="_blank" rel="noopener noreferrer" aria-label="C 음악 YouTube에서 재생하기"><img alt="Every Breath You Take 앨범 커버" src="assets/pc_C.png"/></a>
+<p class="song-title">Every Breath You Take</p><p class="song-artist">Sting</p>
+<p class="song-hint">앨범 커버 또는 아래 버튼 클릭 · 처음부터</p><a class="direct-link song-youtube-cta" href="https://youtu.be/hFk2n_iPLO4?si=BmvXdiQ45Or80xhm" target="_blank" rel="noopener noreferrer">▶ YouTube에서 재생하기 ↗</a>
+</article>
+</div>
+</section>
+
+<!-- 12: TOPSTER RETURNS / MEMBER TYPES -->
+<section class="story member-topster-slide" data-state="member-topster" aria-label="탑스터 재등장 및 부원별 음BTI">
+  <div class="member-topster-stage">
+    <img src="assets/topster.png" class="member-topster-image" alt="16명의 인생곡 탑스터"/>
+    <div class="member-type-overlays">
+      <div class="member-type-label fragment fade-in" data-fragment-index="0" style="left:8.7617%;top:13.1579%" aria-label="1행 1열 LFAC"><span>L</span><span class="f-letter">F</span><span>A</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="1" style="left:25.1168%;top:13.1579%" aria-label="1행 2열 LFEP"><span>L</span><span class="f-letter">F</span><span>E</span><span>P</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="2" style="left:41.4720%;top:13.1579%" aria-label="1행 3열 LFEC"><span>L</span><span class="f-letter">F</span><span>E</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="3" style="left:57.8271%;top:13.1579%" aria-label="1행 4열 LFEC"><span>L</span><span class="f-letter">F</span><span>E</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="4" style="left:8.7617%;top:37.7193%" aria-label="2행 1열 LFEC"><span>L</span><span class="f-letter">F</span><span>E</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="5" style="left:25.1168%;top:37.7193%" aria-label="2행 2열 SFAC"><span>S</span><span class="f-letter">F</span><span>A</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="6" style="left:41.4720%;top:37.7193%" aria-label="2행 3열 SFEC"><span>S</span><span class="f-letter">F</span><span>E</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="7" style="left:57.8271%;top:37.7193%" aria-label="2행 4열 LFEC"><span>L</span><span class="f-letter">F</span><span>E</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="8" style="left:8.7617%;top:62.2807%" aria-label="3행 1열 LFEP"><span>L</span><span class="f-letter">F</span><span>E</span><span>P</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="9" style="left:25.1168%;top:62.2807%" aria-label="3행 2열 LFAC"><span>L</span><span class="f-letter">F</span><span>A</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="10" style="left:41.4720%;top:62.2807%" aria-label="3행 3열 LFEP"><span>L</span><span class="f-letter">F</span><span>E</span><span>P</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="11" style="left:57.8271%;top:62.2807%" aria-label="3행 4열 LFEP"><span>L</span><span class="f-letter">F</span><span>E</span><span>P</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="12" style="left:8.7617%;top:86.8421%" aria-label="4행 1열 LFAC"><span>L</span><span class="f-letter">F</span><span>A</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="13" style="left:25.1168%;top:86.8421%" aria-label="4행 2열 LFAC"><span>L</span><span class="f-letter">F</span><span>A</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="14" style="left:41.4720%;top:86.8421%" aria-label="4행 3열 LFEC"><span>L</span><span class="f-letter">F</span><span>E</span><span>C</span></div>
+      <div class="member-type-label fragment fade-in" data-fragment-index="15" style="left:57.8271%;top:86.8421%" aria-label="4행 4열 LFEC"><span>L</span><span class="f-letter">F</span><span>E</span><span>C</span></div>
+    </div>
+  </div>
+  <span class="fragment member-f-trigger" data-fragment-index="16" aria-hidden="true"></span>
+</section>
+
+<!-- 13: F PREFERENCE / QUIZ RESPONSE ANALYSIS -->
+<section class="story f-analysis-slide" data-state="f-analysis" aria-label="F 유형 응답 분석">
+  <p class="fa-kicker">13 / 맥박 F 쏠림 현상</p>
+  <h2 class="fa-head">왜 이렇게 <em>F</em>가 많았을까?</h2>
+  <div class="fa-panels">
+    <article class="fa-panel fragment fade-up">
+      <p class="fa-q">Q11</p>
+      <p class="fa-question">추천받은 노래가 처음에 별로였다면?</p>
+      <div class="fa-meter"><div class="fa-f" style="width:74%"></div><div class="fa-n" style="width:26%"></div></div>
+      <div class="fa-stats"><p class="fa-stat"><strong>약 74%</strong>익숙한 내 취향으로<br>돌아간다</p><p class="fa-stat secondary"><strong>약 26%</strong>몇 번 더 듣고<br>매력을 찾아본다</p></div>
+    </article>
+    <article class="fa-panel fragment fade-up">
+      <p class="fa-q">Q7</p>
+      <p class="fa-question">음악 앱에서 더 자주 누르는 것은?</p>
+      <div class="fa-meter"><div class="fa-f" style="width:70%"></div><div class="fa-n" style="width:30%"></div></div>
+      <div class="fa-stats"><p class="fa-stat"><strong>약 70%</strong>내 플레이리스트·<br>좋아요 목록</p><p class="fa-stat secondary"><strong>약 30%</strong>추천 믹스·<br>새로운 발매 목록</p></div>
+    </article>
+  </div>
+  <p class="fa-conclusion fragment fade-up">우리는 새로운 음악보다, 이미 좋아하는 음악에 더 자주 손이 간다.</p>
+</section>
+
+<!-- 14: FINAL THOUGHT / DISCOVER YOUR OWN UNKNOWN -->
+<section class="final-message-slide" data-state="final-message" aria-label="음BTI 결론">
+  <p class="fm-kicker">14</p>
+  <p class="fm-first fragment fade-up">우리는 <strong>새로운 음악</strong>을 좋아한다고 말했지만,<br/>사실은 <strong>익숙한 음악</strong>에 더 손이 가는 사람들이었다.</p>
+  <div class="fm-break fragment fade-in"></div>
+  <p class="fm-question fragment fade-up"><span class="fm-others">‘사람들’</span>이 모르는 음악을 찾는 데 집중하느라,<br/><span class="fm-me">‘내’</span>가 모르는 음악을 알아가는 일에는<br/>소홀했던 건 아닐까?</p>
+</section>
+<!-- 15: END / single phrase morphs in place -->
+<section class="unknown-ending" aria-label="마지막 장면: 남의 무지에서 나의 미지로">
+  <div class="unknown-center">
+    <div class="unknown-phrase" aria-label="남의 무지에서 나의 미지로">
+      <span class="unknown-word"><span class="old-letter">남</span><span class="new-letter">나</span>의</span>
+      <span class="unknown-word"><span class="old-letter">무</span><span class="new-letter">미</span>지</span>
+    </div>
+    <span class="unknown-morph-trigger fragment" aria-hidden="true"></span>
+  </div>
+</section>
+<!-- 16: FINAL CREDITS / RETURN TO THE OPENING LOGO -->
+<section class="opening closing-logo-slide" data-state="closing-logo" aria-label="음BTI 엔딩 타이틀">
+  <div class="logo-stage closing-logo-stage">
+    <div class="logo-morph" id="closingLogoMorph" aria-label="음BTI">
+      <span class="logo-character" id="closingLogoCharacter">音</span><span class="logo-bti">BTI</span>
+    </div>
+  </div>
+  <p class="tagline logo-subtitle" id="closingLogoTagline">당신은 어떤 방식으로 음악을 좋아하시나요?</p>
+  <p class="logo-credit" id="closingLogoCredit">MACBAK 음악문화 연구회</p>
+</section>
+</div></div>
+<script src="dist/reveal.js"></script>
+<script>
+const grid=document.getElementById('grid');
+for(let i=1;i<=16;i++){
+ const img=document.createElement('img');img.className='cover';img.src=`assets/cover_${String(i).padStart(2,'0')}.jpg`;
+ img.style.setProperty('--dx',`${((i*73)%500)-250}px`);img.style.setProperty('--dy',`${((i*127)%500)-250}px`);
+ img.style.setProperty('--rot',`${((i*41)%90)-45}deg`);img.alt=`앨범 커버 ${i}`;grid.append(img);
+}
+const typesGrid=document.getElementById('typesGrid');
+for(const a of ['L','S'])for(const b of ['F','N'])for(const c of ['E','A'])for(const d of ['P','C']){const chip=document.createElement('div');chip.className='type-chip fragment fade-up';chip.setAttribute('data-fragment-index',typesGrid.children.length);chip.textContent=a+b+c+d;typesGrid.appendChild(chip)}
+Reveal.initialize({hash:true,transition:'fade',transitionSpeed:'slow',controls:true,progress:false,center:true});
+let timers=[];
+function clearTimers(){timers.forEach(clearTimeout);timers=[]}
+function enterSlide(index){
+ clearTimers();document.querySelectorAll('.cover').forEach(x=>x.classList.remove('show'));
+ document.getElementById('full').classList.remove('show');
+ const morph=document.getElementById('logoMorph');
+ morph.classList.remove('is-glitch','is-bti','is-final');
+ document.getElementById('logoCharacter').textContent='音';
+ document.getElementById('logoTagline').classList.remove('visible');
+ document.getElementById('logoCredit').classList.remove('visible');
+ document.getElementById('logoPresenter').classList.remove('visible');
+ if(index===0){
+  const covers=[...document.querySelectorAll('.cover')];
+  covers.forEach((cover,i)=>timers.push(setTimeout(()=>cover.classList.add('show'),500+i*380)));
+ }
+ if(index===1)timers.push(setTimeout(()=>document.getElementById('full').classList.add('show'),180));
+ if(document.querySelectorAll('.reveal .slides > section')[index]?.classList.contains('closing-logo-slide')){
+  const closing=document.getElementById('closingLogoMorph');
+  const char=document.getElementById('closingLogoCharacter');
+  closing.classList.remove('is-glitch','is-bti','is-final');
+  char.textContent='音';
+  document.getElementById('closingLogoTagline').classList.remove('visible');
+  document.getElementById('closingLogoCredit').classList.remove('visible');
+  timers.push(setTimeout(()=>closing.classList.add('is-glitch'),800));
+  timers.push(setTimeout(()=>{char.textContent='음';closing.classList.remove('is-glitch');},1250));
+  timers.push(setTimeout(()=>closing.classList.add('is-bti'),1700));
+  timers.push(setTimeout(()=>closing.classList.add('is-final'),2400));
+  timers.push(setTimeout(()=>document.getElementById('closingLogoTagline').classList.add('visible'),2800));
+  timers.push(setTimeout(()=>document.getElementById('closingLogoCredit').classList.add('visible'),3100));
+ }
+ if(index===2){
+  timers.push(setTimeout(()=>morph.classList.add('is-glitch'),1100));
+  timers.push(setTimeout(()=>{document.getElementById('logoCharacter').textContent='음';morph.classList.remove('is-glitch');},1540));
+  timers.push(setTimeout(()=>morph.classList.add('is-bti'),2050));
+  timers.push(setTimeout(()=>morph.classList.add('is-final'),2850));
+  timers.push(setTimeout(()=>document.getElementById('logoTagline').classList.add('visible'),3250));
+  timers.push(setTimeout(()=>document.getElementById('logoCredit').classList.add('visible'),3600));
+  timers.push(setTimeout(()=>document.getElementById('logoPresenter').classList.add('visible'),3850));
+ }
+}
+Reveal.on('ready',e=>enterSlide(e.indexh));
+Reveal.on('slidechanged',e=>enterSlide(e.indexh));
+Reveal.on('slidechanged',e=>{document.getElementById('deckPage').textContent=String(e.indexh+1).padStart(2,'0')+' / '+String(Reveal.getTotalSlides()).padStart(2,'0');document.getElementById('deckProgress').style.width=((e.indexh+1)/Reveal.getTotalSlides()*100)+'%';document.getElementById('currentTrack').textContent=(e.currentSlide.querySelector('.eyebrow')?.textContent||'음BTI — YOUR MUSIC TYPE').replace(/^\d+ \/ /,'');});
+
+
+
+Reveal.on('fragmentshown', e => {
+  if (e.fragment.classList.contains('member-f-trigger')) {
+    e.fragment.closest('.member-topster-slide').classList.add('f-emphasis');
+  }
+});
+Reveal.on('fragmenthidden', e => {
+  if (e.fragment.classList.contains('member-f-trigger')) {
+    e.fragment.closest('.member-topster-slide').classList.remove('f-emphasis');
+  }
+});
+</script></body></html>
